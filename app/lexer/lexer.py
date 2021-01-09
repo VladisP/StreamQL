@@ -21,8 +21,6 @@ PATTERN = f"(?P<{KEYWORD_GROUP}>{KEYWORD})|(?P<{VARIABLE_GROUP}>{VARIABLE})|(?P<
 regexp = re.compile(PATTERN)
 
 
-# pylint: disable=E1136
-# see https://github.com/PyCQA/pylint/issues/3882
 class Lexer:
     def __init__(self, program: str):
         self._program = program

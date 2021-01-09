@@ -1,0 +1,31 @@
+version: '3'
+
+env:
+  APP: app
+
+tasks:
+  lint:
+    desc: "Run linter"
+    cmds:
+      - isort $APP
+      - flake8 --jobs 4 --statistics --show-source $APP
+      - pylint --jobs 4 --rcfile=setup.cfg $APP
+      - mypy $APP
+  test:
+    desc: "Run tests"
+    cmds:
+      - pytest --verbosity=2 --showlocals
+  coverage:
+    desc: 'Run tests with coverage and open report in default browser'
+    cmds:
+      - pytest --cov --cov-report html
+      - open ./tmp/htmlcov/index.html
+  attach_hooks:
+    desc: "Attaches git hooks"
+    cmds:
+      - cp ./tools/prepare-commit-msg.sh ./.git/hooks/prepare-commit-msg
+      - cp ./tools/pre-commit.sh ./.git/hooks/pre-commit
+      - cp ./tools/pre-push.sh ./.git/hooks/pre-push
+      - chmod 777 ./.git/hooks/prepare-commit-msg
+      - chmod 777 ./.git/hooks/pre-commit
+      - chmod 777 ./.git/hooks/pre-push

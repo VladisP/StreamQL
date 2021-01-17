@@ -1,21 +1,12 @@
-from typing import Any, List, Union
+from typing import List
 
 from app.lexer import Lexer, token
 
-AST = List[Union[token.Token, List[Any]]]
+from .types import AST, ParseError, token_to_atom
 
 
 def parse(program: str) -> AST:
     return Parser(Lexer(program)).parse_command()
-
-
-class ParseError(Exception):
-    def __init__(self, message: str):
-        super().__init__()
-        self.message = message
-
-    def __str__(self) -> str:
-        return self.message
 
 
 class Parser:
@@ -26,7 +17,7 @@ class Parser:
     def _expect(self, expected: List[str]) -> None:
         if self.current.domain not in expected:
             row, column = self.current.coords
-            raise ParseError(f"({row}, {column}): expected {', '.join(expected)}, got ${self.current.value}")
+            raise ParseError(f"({row}, {column}): expected '{', '.join(expected)}', got '{self.current.value}'")
 
     def _next(self) -> None:
         self.current = self.lexer.next_token()
@@ -44,7 +35,7 @@ class Parser:
     # Insert ::= '@new' Entity
     def _parse_insert(self) -> AST:
         self._expect([token.NEW_KEYWORD])
-        ast: AST = [self.current]
+        ast: AST = [token_to_atom(self.current)]
         self._next()
         ast.append(self._parse_entity())
         return ast
@@ -68,14 +59,14 @@ class Parser:
                 ast.append(self._parse_assertion())
                 self._expect([token.RIGHT_PAREN])
             else:
-                ast.append(self.current)
+                ast.append(token_to_atom(self.current))
             self._next()
         return ast
 
     # Rule ::= '@rule' '(' SimpleQuery ')' ('(' Query ')')?
     def _parse_rule(self) -> AST:
         self._expect([token.RULE_KEYWORD])
-        ast: AST = [self.current]
+        ast: AST = [token_to_atom(self.current)]
         self._next()
         self._expect([token.LEFT_PAREN])
         self._next()
@@ -99,24 +90,24 @@ class Parser:
             return self._not_query()
         return self._parse_simple_query()
 
-    # AndQuery ::= 'and' InnerQueries
+    # AndQuery ::= '@and' InnerQueries
     def _parse_and_query(self) -> AST:
         self._expect([token.AND_KEYWORD])
-        ast: AST = [self.current]
+        ast: AST = [token_to_atom(self.current)]
         self._next()
         return [*ast, *self._parse_inner_queries()]
 
-    # OrQuery ::= 'or' InnerQueries
+    # OrQuery ::= '@or' InnerQueries
     def _parse_or_query(self) -> AST:
         self._expect([token.OR_KEYWORD])
-        ast = [self.current]
+        ast = [token_to_atom(self.current)]
         self._next()
         return [*ast, *self._parse_inner_queries()]
 
-    # NotQuery ::= 'not' InnerQuery
+    # NotQuery ::= '@not' InnerQuery
     def _not_query(self) -> AST:
         self._expect([token.NOT_KEYWORD])
-        ast: AST = [self.current]
+        ast: AST = [token_to_atom(self.current)]
         self._next()
         ast.append(self._parse_inner_query())
         return ast
@@ -143,15 +134,15 @@ class Parser:
     # ApplyArguments ::= (Var | Word | Number)+
     def _parse_apply(self) -> AST:
         self._expect([token.APPLY_KEYWORD])
-        ast: AST = [self.current]
+        ast: AST = [token_to_atom(self.current)]
         self._next()
         self._expect([token.LESS_OP, token.GREATER_OP, token.WORD_DOMAIN])
-        ast.append(self.current)
+        ast.append(token_to_atom(self.current))
         self._next()
         expected_domains = [token.VAR_DOMAIN, token.WORD_DOMAIN, token.NUMBER_DOMAIN]
         self._expect(expected_domains)
         while self.current.domain in expected_domains:
-            ast.append(self.current)
+            ast.append(token_to_atom(self.current))
             self._next()
         return ast
 
@@ -165,12 +156,12 @@ class Parser:
                 ast.append(self._parse_simple_query())
                 self._expect([token.RIGHT_PAREN])
             else:
-                ast.append(self.current)
+                ast.append(token_to_atom(self.current))
             self._next()
         if self.current.domain == token.DOT:
-            ast.append(self.current)
+            ast.append(token_to_atom(self.current))
             self._next()
             self._expect([token.VAR_DOMAIN])
-            ast.append(self.current)
+            ast.append(token_to_atom(self.current))
             self._next()
         return ast

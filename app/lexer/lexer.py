@@ -10,7 +10,7 @@ NUMBER_GROUP = "number"
 LINE_FEED_GROUP = "line_feed"
 WHITESPACES_GROUP = "whitespaces"
 
-KEYWORD = r"\(|\)|@new|@rule|@apply|and|or|not|<|>|\."
+KEYWORD = r"\(|\)|@new|@rule|@apply|@and|@or|@not|<|>|\."
 VARIABLE = r"\$[a-zA-Z]+[0-9]*"
 WORD = r"[a-zA-Z]+[0-9]*"
 NUMBER = r"[0-9]+"

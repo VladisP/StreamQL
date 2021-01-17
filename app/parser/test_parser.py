@@ -13,7 +13,7 @@ def to_string(ast: AST) -> StrAST:
         if isinstance(node, list):
             str_ast.append(to_string(node))
         else:
-            str_ast.append(f"{node.domain} : {node.value}")
+            str_ast.append(node.__str__())
     return str_ast
 
 
@@ -47,9 +47,9 @@ def test_new_rule() -> None:
     (@new
         (@rule
             (livesAbout $person1 $person2)
-            (and (address $person1 ($town . $rest1))
+            (@and (address $person1 ($town . $rest1))
                  (address $person2 ($town . $rest2))
-                 (not (same $person1 $person2)))
+                 (@not (same $person1 $person2)))
         )
     )
     """)) == [
@@ -58,7 +58,7 @@ def test_new_rule() -> None:
             "@rule : @rule",
             ["word : livesAbout", "var : $person1", "var : $person2"],
             [
-                "and : and",
+                "@and : @and",
                 [
                     "word : address",
                     "var : $person1",
@@ -70,7 +70,7 @@ def test_new_rule() -> None:
                     ["var : $town", ". : .", "var : $rest2"]
                 ],
                 [
-                    "not : not",
+                    "@not : @not",
                     ["word : same", "var : $person1", "var : $person2"]
                 ]
             ]
@@ -142,13 +142,13 @@ def test_simple_query_advanced() -> None:
 
 def test_query_with_apply() -> None:
     assert to_string(parse("""
-    (or
+    (@or
         (salary $person $amount)
         (@apply > $amount 3000)
         (@apply < $amount 10)
     )
     """)) == [
-        "or : or",
+        "@or : @or",
         ["word : salary", "var : $person", "var : $amount"],
         ["@apply : @apply", "> : >", "var : $amount", "number : 3000"],
         ["@apply : @apply", "< : <", "var : $amount", "number : 10"],

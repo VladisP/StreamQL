@@ -28,12 +28,32 @@ def test_new() -> None:
     ]
 
 
+def test_new2() -> None:
+    assert get_tokens_list("(@new (position (Ivan Ivanov) (developer android)))") == [
+        "( (1, 1): (",
+        "@new (1, 2): @new",
+        "( (1, 7): (",
+        "word (1, 8): position",
+        "( (1, 17): (",
+        "word (1, 18): Ivan",
+        "word (1, 23): Ivanov",
+        ") (1, 29): )",
+        "( (1, 31): (",
+        "word (1, 32): developer",
+        "word (1, 42): android",
+        ") (1, 49): )",
+        ") (1, 50): )",
+        ") (1, 51): )",
+        "eof (1, 52): "
+    ]
+
+
 def test_rule() -> None:
     assert get_tokens_list("""
         (@rule (livesAbout $person1 $person2)
-            (and (address $person1 ($town . $rest1))
+            (@and (address $person1 ($town . $rest1))
                  (address $person2 ($town . $rest2))
-                 (not (same $person1 $person2))))
+                 (@not (same $person1 $person2))))
         """) == [
         "( (2, 9): (",
         "@rule (2, 10): @rule",
@@ -43,16 +63,16 @@ def test_rule() -> None:
         "var (2, 37): $person2",
         ") (2, 45): )",
         "( (3, 13): (",
-        "and (3, 14): and",
-        "( (3, 18): (",
-        "word (3, 19): address",
-        "var (3, 27): $person1",
-        "( (3, 36): (",
-        "var (3, 37): $town",
-        ". (3, 43): .",
-        "var (3, 45): $rest1",
-        ") (3, 51): )",
+        "@and (3, 14): @and",
+        "( (3, 19): (",
+        "word (3, 20): address",
+        "var (3, 28): $person1",
+        "( (3, 37): (",
+        "var (3, 38): $town",
+        ". (3, 44): .",
+        "var (3, 46): $rest1",
         ") (3, 52): )",
+        ") (3, 53): )",
         "( (4, 18): (",
         "word (4, 19): address",
         "var (4, 27): $person2",
@@ -63,29 +83,29 @@ def test_rule() -> None:
         ") (4, 51): )",
         ") (4, 52): )",
         "( (5, 18): (",
-        "not (5, 19): not",
-        "( (5, 23): (",
-        "word (5, 24): same",
-        "var (5, 29): $person1",
-        "var (5, 38): $person2",
-        ") (5, 46): )",
+        "@not (5, 19): @not",
+        "( (5, 24): (",
+        "word (5, 25): same",
+        "var (5, 30): $person1",
+        "var (5, 39): $person2",
         ") (5, 47): )",
         ") (5, 48): )",
         ") (5, 49): )",
+        ") (5, 50): )",
         "eof (6, 9): "
     ]
 
 
 def test_apply() -> None:
     assert get_tokens_list("""
-        (or 
+        (@or 
             (salary $person $amount) 
             (@apply > $amount 3000) 
             (@apply < $amount 10)
         )
         """) == [
         "( (2, 9): (",
-        "or (2, 10): or",
+        "@or (2, 10): @or",
         "( (3, 13): (",
         "word (3, 14): salary",
         "var (3, 21): $person",

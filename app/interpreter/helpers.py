@@ -41,8 +41,8 @@ def is_insert(ast: AST) -> bool:
     return is_non_empty_list(ast) and is_atom(ast[0]) and ast[0].domain == token.NEW_KEYWORD
 
 
-def get_entity(insert_command: AST) -> AST:
-    return insert_command[1]
+def get_entities(insert_command: AST) -> AST:
+    return insert_command[1:]
 
 
 def is_rule(entity: AST) -> bool:

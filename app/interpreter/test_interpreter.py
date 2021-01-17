@@ -431,3 +431,42 @@ def test_unknown_apply():
         "(@new (salary Ekaterina 5))",
         "(@and (salary $person $amount) (@apply newPredicate $amount 50))"
     ]) == []
+
+
+def test_batch_new():
+    assert run_commands([
+        """
+         (@new
+            (@rule (bigBoss $person)
+                (@and
+                    (boss $middleManager $person)
+                    (boss $x $middleManager)
+                )
+            )
+            (position Denis developer)
+            (boss Vlad Denis)
+            (position Vlad developer)
+            (boss Alex Vlad)
+            (position Alex developer)
+            (position Nika HR)
+            (boss Alla Nika)
+            (position Alla HR)
+            (boss Ekaterina Alla)
+            (position Ekaterina HR)
+         )
+         """,
+        "(. $all)"
+    ]) == [
+               "(position Denis developer)",
+               "(boss Vlad Denis)",
+               "(position Vlad developer)",
+               "(boss Alex Vlad)",
+               "(position Alex developer)",
+               "(position Nika HR)",
+               "(boss Alla Nika)",
+               "(position Alla HR)",
+               "(boss Ekaterina Alla)",
+               "(position Ekaterina HR)",
+               "(bigBoss Denis)",
+               "(bigBoss Nika)"
+           ]

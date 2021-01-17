@@ -32,12 +32,14 @@ class Parser:
         self._expect([token.EOF_DOMAIN])
         return ast
 
-    # Insert ::= '@new' Entity
+    # Insert ::= '@new' Entity+
     def _parse_insert(self) -> AST:
         self._expect([token.NEW_KEYWORD])
         ast: AST = [token_to_atom(self.current)]
         self._next()
-        ast.append(self._parse_entity())
+        self._expect([token.LEFT_PAREN])
+        while self.current.domain == token.LEFT_PAREN:
+            ast.append(self._parse_entity())
         return ast
 
     # Entity ::= '(' Assertion | Rule ')'

@@ -19,16 +19,17 @@ class Interpreter:
     def run(self, command: str) -> None:
         command_ast = parse(command)
         if is_insert(command_ast):
-            self._insert(get_entity(command_ast))
+            self._insert(get_entities(command_ast))
         else:
             for frame in self._run_query(command_ast, [{}]):
                 self.consume(instantiate(command_ast, frame))
 
-    def _insert(self, entity: AST) -> None:
-        if is_rule(entity):
-            self._insert_rule(entity)
-        else:
-            self._insert_assertion(entity)
+    def _insert(self, entities: AST) -> None:
+        for entity in entities:
+            if is_rule(entity):
+                self._insert_rule(entity)
+            else:
+                self._insert_assertion(entity)
 
     def _insert_rule(self, rule: AST):
         self._store_rule_in_index(rule)

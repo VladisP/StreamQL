@@ -158,3 +158,16 @@ def test_query_with_apply() -> None:
 def test_parse_error() -> None:
     with pytest.raises(ParseError):
         parse("(@new (@rule (same $x $x))")
+
+
+def test_batch_new() -> None:
+    assert to_string(parse("""
+    (@new
+        (@rule (same $x $x))
+        (position Vlad (junior developer))
+    )
+    """)) == [
+        "@new : @new",
+        ["@rule : @rule", ["word : same", "var : $x", "var : $x"]],
+        ["word : position", "word : Vlad", ["word : junior", "word : developer"]]
+    ]

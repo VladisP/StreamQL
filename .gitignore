@@ -2,3 +2,5 @@
 __pycache__/
 venv
 tmp
+tools/src/*
+!tools/src/.gitkeep

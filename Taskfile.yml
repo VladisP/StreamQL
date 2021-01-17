@@ -4,6 +4,10 @@ env:
   APP: app
 
 tasks:
+  run:
+    desc: "Run program"
+    cmds:
+      - python main.py
   lint:
     desc: "Run linter"
     cmds:
